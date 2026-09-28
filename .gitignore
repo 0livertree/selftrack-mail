@@ -1,0 +1,11 @@
+# Runtime data (token, tracking records, certificates) — never commit
+*.db
+config.json
+server/acme/
+server/lego/
+*.crt
+*.key
+*.pem
+
+__pycache__/
+*.pyc

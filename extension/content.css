@@ -1,0 +1,28 @@
+.mt-badge {
+  display: inline-block;
+  font: 500 12px/1.6 'Google Sans', Roboto, Arial, sans-serif;
+  color: #5f6368;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.mt-badge.mt-opened {
+  color: #188038;
+}
+
+.mt-list-badge {
+  margin-right: 6px;
+  font-weight: 700;
+}
+
+.mt-thread-badge {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: #f1f3f4;
+}
+
+.mt-thread-badge.mt-opened {
+  background: #e6f4ea;
+}

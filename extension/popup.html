@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>SelfTrack Mail</title>
+  <style>
+    body { width: 340px; margin: 0; font: 13px/1.5 'Segoe UI', Roboto, Arial, sans-serif; color: #202124; }
+    header { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; display: flex; align-items: center; justify-content: space-between; }
+    h1 { margin: 0; font-size: 15px; }
+    section { padding: 12px 16px; border-bottom: 1px solid #e0e0e0; }
+    label { display: block; margin-bottom: 8px; color: #5f6368; font-size: 12px; }
+    input[type=text], input[type=password] { display: block; width: 100%; box-sizing: border-box; margin-top: 2px; padding: 6px 8px; border: 1px solid #dadce0; border-radius: 4px; font: inherit; }
+    .row { display: flex; gap: 8px; align-items: center; }
+    button { padding: 6px 14px; border: 0; border-radius: 4px; background: #1a73e8; color: #fff; font: inherit; cursor: pointer; }
+    button.secondary { background: #f1f3f4; color: #202124; }
+    #status { font-size: 12px; color: #5f6368; }
+    #status.ok { color: #188038; }
+    #status.err { color: #d93025; }
+    ul { list-style: none; margin: 0; padding: 0; max-height: 260px; overflow-y: auto; }
+    li { padding: 6px 0; border-bottom: 1px solid #f1f3f4; }
+    li:last-child { border-bottom: 0; }
+    .subj { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+    .meta { color: #5f6368; font-size: 12px; }
+    .opened { color: #188038; }
+    .empty { color: #5f6368; }
+    li { position: relative; padding-right: 24px; }
+    button.del { position: absolute; top: 6px; right: 0; padding: 0 6px; background: none; color: #9aa0a6; font-size: 16px; line-height: 1.2; }
+    button.del:hover { color: #d93025; background: #fce8e6; }
+    .list-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
+    button.clear { background: none; color: #d93025; padding: 4px 8px; font-size: 12px; }
+    button.clear:hover, button.clear.armed { background: #fce8e6; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SelfTrack Mail</h1>
+    <label class="row" style="margin:0"><input type="checkbox" id="enabled"> 추적 사용</label>
+  </header>
+  <section>
+    <label>공개 URL (픽셀용: 공인 IP 또는 터널 주소)
+      <input type="text" id="publicUrl" placeholder="http://203.0.113.10 또는 https://xxxx.trycloudflare.com">
+    </label>
+    <label>서버 토큰
+      <input type="password" id="token" placeholder="server.py 실행 시 출력되는 토큰">
+    </label>
+    <label>로컬 API 주소
+      <input type="text" id="apiUrl" placeholder="http://127.0.0.1:8787">
+    </label>
+    <div class="row">
+      <button id="save">저장 및 연결 확인</button>
+      <span id="status"></span>
+    </div>
+  </section>
+  <section>
+    <ul id="list"><li class="empty">불러오는 중…</li></ul>
+    <div class="list-footer"><button id="clearAll" class="clear" hidden>전체 삭제</button></div>
+  </section>
+  <script src="popup.js"></script>
+</body>
+</html>
