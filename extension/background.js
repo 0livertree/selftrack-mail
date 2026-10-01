@@ -42,6 +42,9 @@ const handlers = {
     cache.at = 0;
     return res;
   },
+  async getOpens({ id }) {
+    return api(`/api/message-opens?id=${encodeURIComponent(id)}`);
+  },
   async getMessages({ force }) {
     return { messages: await getMessages(force) };
   },

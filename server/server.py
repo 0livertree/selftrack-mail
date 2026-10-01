@@ -7,6 +7,7 @@
 - POST /api/self-view   : sender is viewing these ids, ignore their hits (token required)
 - POST /api/messages/delete : {"ids": [...]} or {"all": true}; deletes messages and their opens (token required)
 - GET  /api/opens       : settled opens after a cursor, for notifications (token required)
+- GET  /api/message-opens?id=<id> : one message's opens with time, IP and client (token required)
 
 /api/* only accepts direct local requests; anything coming through a tunnel is rejected.
 """
@@ -249,6 +250,73 @@ def latest_open_id():
     return row["id"] or 0
 
 
+def describe_client(ua):
+    """Best-effort, human-readable client name from a User-Agent. Returns (label, via_proxy)."""
+    ua = ua or ""
+    if is_gmail_proxy(ua):
+        return "Gmail (Google image proxy)", True
+    if "YahooMailProxy" in ua:
+        return "Yahoo Mail (image proxy)", True
+    if "Microsoft Outlook" in ua or "ms-office" in ua or "MSOffice" in ua:
+        return "Outlook (desktop)", False
+    if "Thunderbird" in ua:
+        return "Thunderbird", False
+
+    if "iPhone" in ua:
+        os_name = "iPhone"
+    elif "iPad" in ua:
+        os_name = "iPad"
+    elif "Android" in ua:
+        os_name = "Android"
+    elif "Windows" in ua:
+        os_name = "Windows"
+    elif "Macintosh" in ua or "Mac OS X" in ua:
+        os_name = "Mac"
+    elif "Linux" in ua:
+        os_name = "Linux"
+    else:
+        os_name = ""
+
+    if "Whale/" in ua:
+        app = "Whale"
+    elif "NAVER(" in ua or "NaverMail" in ua:
+        app = "Naver app"
+    elif "Edg/" in ua or "EdgA/" in ua or "EdgiOS/" in ua:
+        app = "Edge"
+    elif "SamsungBrowser/" in ua:
+        app = "Samsung Internet"
+    elif "OPR/" in ua:
+        app = "Opera"
+    elif "Firefox/" in ua or "FxiOS/" in ua:
+        app = "Firefox"
+    elif "Chrome/" in ua or "CriOS/" in ua:
+        app = "Chrome"
+    elif "Safari/" in ua:
+        app = "Safari"
+    elif "AppleWebKit" in ua and os_name in ("iPhone", "iPad", "Mac"):
+        app = "Mail app"  # Apple Mail and other in-app web views omit the Safari token
+    else:
+        app = ""
+
+    label = " · ".join(p for p in (os_name, app) if p)
+    return label or "Unknown client", False
+
+
+def list_message_opens(msg_id):
+    """Counted (not ignored, settled) opens of one message, newest first, with a readable client label."""
+    settled = time.time() - SETTLE
+    with db_lock:
+        rows = db.execute(
+            "SELECT ts, ip, ua FROM opens WHERE msg_id = ? AND ignored IS NULL AND ts <= ? ORDER BY ts DESC",
+            (msg_id, settled),
+        ).fetchall()
+    opens = []
+    for r in rows:
+        client, via_proxy = describe_client(r["ua"])
+        opens.append({"ts": r["ts"], "ip": r["ip"], "client": client, "via_proxy": via_proxy})
+    return opens
+
+
 class PixelLimiter:
     """In-memory limits so a flood of pixel requests can't grow the DB or hog the server."""
 
@@ -424,6 +492,12 @@ class Handler(BaseHTTPRequestHandler):
                 if url.path == "/api/messages":
                     limit = max(1, min(int(qs.get("limit", ["200"])[0]), 1000))
                     self.send_json(200, {"messages": list_messages(limit)})
+                    return
+                if url.path == "/api/message-opens":
+                    msg_id = qs.get("id", [""])[0]
+                    if not ID_RE.match(msg_id):
+                        raise ValueError("invalid id")
+                    self.send_json(200, {"opens": list_message_opens(msg_id)})
                     return
                 if url.path == "/api/opens":
                     after = qs.get("after", [None])[0]

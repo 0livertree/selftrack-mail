@@ -29,6 +29,24 @@
     .list-footer { display: flex; justify-content: flex-end; margin-top: 8px; }
     button.clear { background: none; color: #d93025; padding: 4px 8px; font-size: 12px; }
     button.clear:hover, button.clear.armed { background: #fce8e6; }
+    li.expandable { cursor: pointer; }
+    li.expandable:hover .subj { color: #1a73e8; }
+    li.expandable .subj::before { content: '▸ '; color: #9aa0a6; }
+    li.expandable.open .subj::before { content: '▾ '; }
+    .detail { margin: 6px 0 2px; padding: 8px 10px; border-radius: 6px; background: #f8f9fa; cursor: default; }
+    .detail-title { font-size: 11px; font-weight: 600; color: #5f6368; margin: 2px 0 6px; }
+    .detail-title:not(:first-child) { margin-top: 10px; }
+    .group { margin-bottom: 6px; }
+    .group-head { display: flex; align-items: center; gap: 6px; }
+    .client { font-weight: 500; }
+    .group-meta { margin-left: 24px; color: #5f6368; font-size: 12px; }
+    .letter { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: #e8f0fe; color: #1a73e8; font-size: 11px; font-weight: 700; }
+    .letter.small { width: 15px; height: 15px; font-size: 10px; }
+    .timeline { list-style: none; margin: 0; padding: 0; max-height: none; }
+    .timeline li { padding: 2px 0; border: 0; font-size: 12px; color: #3c4043; }
+    .muted { color: #5f6368; font-size: 12px; }
+    .note { margin-top: 2px; }
+    .err { color: #d93025; font-size: 12px; }
   </style>
 </head>
 <body>
